@@ -1,0 +1,12 @@
+opencollection: 1.0.0
+info:
+  name: "springlab1"
+  type: workspace
+
+collections:
+  - name: "main"
+    path: "collections/main"
+
+specs:
+
+docs: ''
