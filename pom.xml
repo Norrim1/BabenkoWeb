@@ -11,7 +11,7 @@
 	<groupId>com.example</groupId>
 	<artifactId>springlab</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>springlab</name>
+	<name>spring-first</name>
 	<description>Spring Boot project</description>
 	<url/>
 	<licenses>
@@ -64,8 +64,7 @@
 	</dependencies>
 
 	<build>
-		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+		<sourceDirectory>${project.basedir}/springlab/src/main/kotlin</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
