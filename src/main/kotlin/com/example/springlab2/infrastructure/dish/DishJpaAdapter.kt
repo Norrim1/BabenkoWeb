@@ -15,10 +15,8 @@ class DishJpaAdapter (
 ) : DishRepositoryPort {
 
     override fun getList(): List<Dish> {
-        val dishes = dishJpaRepository.findAll()
-        for (dish in dishes)
-            dish.toDomain()
-        return dishes as List<Dish>
+        return dishJpaRepository.findAll()
+            .map { it.toDomain() }
     }
 
     override fun create(dish: Dish): Dish =

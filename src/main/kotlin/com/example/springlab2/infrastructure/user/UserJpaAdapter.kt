@@ -21,10 +21,8 @@ class UserJpaAdapter(
     }
 
     override fun getList(): List<User> {
-        val users = userJpaRepository.findAll()
-        for (user in users)
-            user.toDomain()
-        return users as List<User>
+        return userJpaRepository.findAll()
+            .map { it.toDomain() }
     }
 
     override fun deleteById(id: Long): Boolean {
