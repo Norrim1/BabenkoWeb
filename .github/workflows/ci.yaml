@@ -1,0 +1,79 @@
+name: Spring boot CI
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  check-tasks:
+    runs-on: ubuntu-latest
+
+    # Добавляем сервис PostgreSQL
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER || 'test' }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD || 'test' }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB || 'testdb' }}
+        ports:
+          - 5432:5432
+        # Healthcheck чтобы дождаться готовности БД перед запуском тестов
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Grant scripts permission
+        run: chmod +x ./mvnw ./.test/run-test.sh
+
+      - name: Load .env
+        run: cat .env >> "$GITHUB_ENV"
+
+      - name: Compile Spring app
+        run: ./mvnw clean package
+
+      - name: Run Spring app
+        run: java -jar ./target/*.jar --server.port=${{ env.SERVER_PORT }} &
+        env:
+          # Передаём параметры подключения к БД приложению
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+          SPRING_DATASOURCE_USERNAME: ${{ env.POSTGRES_USER || 'postgres' }}
+          SPRING_DATASOURCE_PASSWORD: ${{ env.POSTGRES_PASSWORD || 'postgres' }}
+
+      - name: Wait for app to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:8080/actuator/health | grep -q UP; then
+              echo "App is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "App failed to start"
+          exit 1
+
+      - name: Run tests
+        run: ./.test/run-test.sh
+        env:
+          BASE_URL: http://127.0.0.1:8080
+          # Передаём те же переменные тестам, если они подключаются к БД напрямую
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+          SPRING_DATASOURCE_USERNAME: ${{ env.POSTGRES_USER || 'postgres' }}
+          SPRING_DATASOURCE_PASSWORD: ${{ env.POSTGRES_PASSWORD || 'postgres' }}
