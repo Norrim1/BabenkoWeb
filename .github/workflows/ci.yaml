@@ -53,14 +53,14 @@ jobs:
         run: java -jar ./target/*.jar --server.port=${{ env.SERVER_PORT }} &
         env:
           # Передаём параметры подключения к БД приложению
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB || 'testdb' }}
-          SPRING_DATASOURCE_USERNAME: ${{ env.POSTGRES_USER || 'test' }}
-          SPRING_DATASOURCE_PASSWORD: ${{ env.POSTGRES_PASSWORD || 'test' }}
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+          SPRING_DATASOURCE_USERNAME: ${{ env.POSTGRES_USER || 'postgres' }}
+          SPRING_DATASOURCE_PASSWORD: ${{ env.POSTGRES_PASSWORD || 'postgres' }}
 
       - name: Wait for app to be ready
         run: |
           for i in {1..30}; do
-            if curl -s http://localhost:${{ env.SERVER_PORT }}/actuator/health | grep -q UP; then
+            if curl -s http://127.0.0.1:8080/actuator/health | grep -q UP; then
               echo "App is ready"
               exit 0
             fi
@@ -72,8 +72,8 @@ jobs:
       - name: Run tests
         run: ./.test/run-test.sh
         env:
-          BASE_URL: http://localhost:${{ env.SERVER_PORT }}
+          BASE_URL: http://127.0.0.1:8080
           # Передаём те же переменные тестам, если они подключаются к БД напрямую
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB || 'testdb' }}
-          SPRING_DATASOURCE_USERNAME: ${{ env.POSTGRES_USER || 'test' }}
-          SPRING_DATASOURCE_PASSWORD: ${{ env.POSTGRES_PASSWORD || 'test' }}
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+          SPRING_DATASOURCE_USERNAME: ${{ env.POSTGRES_USER || 'postgres' }}
+          SPRING_DATASOURCE_PASSWORD: ${{ env.POSTGRES_PASSWORD || 'postgres' }}
