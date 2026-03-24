@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_URL="${BASE_URL:-http://localhost:8080}"
+BASE_URL="${BASE_URL:-http:///127.0.0.1:8080}"
 CONTENT_TYPE="Content-Type: application/json"
 
 GREEN='\033[0;32m'
