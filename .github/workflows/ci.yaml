@@ -58,4 +58,4 @@ jobs:
       - name: Run tests
         run: ./.test/run-test.sh
         env:
-          BASE_URL: http://localhost:${{ env.SERVER_PORT }}
+          BASE_URL: http:///127.0.0.1:${{ env.SERVER_PORT }}

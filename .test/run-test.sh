@@ -80,7 +80,7 @@ echo "Ожидаю запуск сервера на $BASE_URL..."
 RETRIES=30 # 30 * 2 сек = до 1 минуты
 count=0
 
-until curl -s "$BASE_URL/api/v1/users" > /dev/null; do
+until curl -s "$BASE_URL/users" > /dev/null; do
     count=$((count + 1))
     if [ $count -ge $RETRIES ]; then
         echo -e "${RED}Ошибка: сервер не запустился за минуту.${NC}"
